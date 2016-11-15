@@ -7,22 +7,26 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class ViewController: UIViewController {
     
+    let disposeBag = DisposeBag()
+    
     @IBOutlet weak var nameLabel: UILabel!
-    var name: String = "Julia"
+    var name: Variable<String> = Variable("Julia")
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
+        name.asObservable()
+            .bindTo(self.nameLabel.rx.text)
+            .addDisposableTo(disposeBag)
     }
     
     @IBAction func changeNameButtonTapped(_ sender: AnyObject) {
-        print("changeNameButtonTapped")
         showAlertController()
-    
     }
     
     
@@ -33,8 +37,7 @@ class ViewController: UIViewController {
         alert.addAction(cancelAction)
         let okAction = UIAlertAction(title: "OK", style: .default) { action in
             if let textInput = alert.textFields?.first?.text {
-                self.name = textInput
-                self.nameLabel.text = self.name
+                self.name.value = textInput
             }
         }
         alert.addTextField()
